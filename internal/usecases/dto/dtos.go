@@ -1,23 +1,28 @@
 package dto
 
+import (
+	"time"
+)
+
 type Session struct {
 	ID      string
 	UserID  string
-	Expires string
+	Expires time.Time
 }
 
 type LoginToken struct {
 	OneTimeToken string
-	Namespace    string
-	Expiration   string
-	NotBefore    string
+	UserID       string
+	Expiration   time.Time
+	NotBefore    time.Time
 }
 
 type OneTimeToken struct {
-	UserID string
-	Token  string
+	UserID  string
+	Token   string
+	Expires time.Time
 }
 
 type User struct {
-	Destination string
+	ID string
 }

@@ -39,7 +39,11 @@ func (d *DoLogin) Login(in *DoLoginInput) (*DoLoginOutput, error) {
 	// check if one time token is valid
 	ott := loginToken.GetOneTimeToken()
 	// if this is successful then the token was good
-	oneTimeToken, err := d.GetToken(ott.UserID, ott.Token)
+	dtoOTT, err := d.GetToken(ott.UserID, ott.Token)
+	if err != nil {
+		return nil, err
+	}
+	oneTimeToken, err := domain.NewOneTimeToken(dtoOTT.UserID, dtoOTT.Token, dtoOTT.Expires)
 	if err != nil {
 		return nil, err
 	}

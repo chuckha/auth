@@ -9,3 +9,7 @@ type UseCasesAdapter struct{}
 func (a *UseCasesAdapter) Login(input *LoginInput) *usecases.DoLoginInput {
 	return nil
 }
+
+func (a *UseCasesAdapter) SendLoginMessage(in *SendLoginMessageInput) *usecases.SendLoginMessageInput {
+	return nil
+}

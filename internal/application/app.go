@@ -10,6 +10,11 @@ type Authentication struct {
 	Presenter
 }
 
+type UseCases interface {
+	Login(in *usecases.DoLoginInput) (*usecases.DoLoginOutput, error)
+	SendLoginMessage(in *usecases.SendLoginMessageInput) (*usecases.SendLoginMessageOutput, error)
+}
+
 type Adapter interface {
 	Login(input *LoginInput) *usecases.DoLoginInput
 	SendLoginMessage(in *SendLoginMessageInput) *usecases.SendLoginMessageInput
@@ -20,12 +25,13 @@ type Presenter interface {
 	SendLoginMessage(in *usecases.SendLoginMessageOutput) *SendLoginMessageOutput
 }
 
-type UseCases interface {
-	Login(in *usecases.DoLoginInput) (*usecases.DoLoginOutput, error)
-	SendLoginMessage(in *usecases.SendLoginMessageInput) (*usecases.SendLoginMessageOutput, error)
+func NewAuthentication(useCases UseCases, adapter Adapter, presenter Presenter) *Authentication {
+	return &Authentication{
+		UseCases:  useCases,
+		Adapter:   adapter,
+		Presenter: presenter,
+	}
 }
-
-// Think of the input as the controller input and the output is a view model
 
 type LoginInput struct{}
 type LoginOutput struct{}

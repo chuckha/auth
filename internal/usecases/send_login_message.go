@@ -22,13 +22,13 @@ type SetClaimCreator interface {
 }
 
 type TokenRepository interface {
-	GetToken(namespace, id string) (*dto.OneTimeToken, error)
+	GetToken(uid, token string) (*dto.OneTimeToken, error)
 	SaveToken(token *dto.OneTimeToken) error
-	DeleteToken(namespace, id string) error
+	DeleteToken(uid, token string) error
 }
 
 type UserRepository interface {
-	GetUser(destination string) (*dto.User, error)
+	GetUser(uid string) (*dto.User, error)
 	CreateUser(*dto.User) error
 }
 
@@ -56,7 +56,7 @@ type SendLoginMessageOutput struct{}
 func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendLoginMessageOutput, error) {
 	// create a one-time-token and save it
 	token := l.ID()
-	ott, err := domain.NewOneTimeToken(in.Destination, token)
+	ott, err := domain.CreateOneTimeToken(in.Destination, token)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendL
 		if err2 != nil {
 			return nil, err
 		}
-		u := &dto.User{Destination: newUser.GetDestination()}
+		u := &dto.User{ID: newUser.GetDestination()}
 		if err := l.CreateUser(u); err != nil {
 			return nil, err
 		}
@@ -87,7 +87,7 @@ func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendL
 	}
 	dtoLoginToken := &dto.LoginToken{
 		OneTimeToken: ott.Token,
-		Namespace:    ott.UserID,
+		UserID:       ott.UserID,
 		Expiration:   loginToken.GetExpiration(),
 		NotBefore:    loginToken.GetNotBefore(),
 	}

@@ -20,42 +20,34 @@ type loginToken struct {
 	uid          string
 }
 
-func (l *loginToken) GetExpiration() string {
-	return l.expiration.Format(time.RFC3339)
+func (l *loginToken) GetExpiration() time.Time {
+	return l.expiration
 }
 
-func (l *loginToken) GetNotBefore() string {
-	return l.expiration.Format(time.RFC3339)
+func (l *loginToken) GetNotBefore() time.Time {
+	return l.expiration
 }
 
 func (l *loginToken) GetOneTimeToken() oneTimeToken {
 	return l.oneTimeToken
 }
 
-func NewLoginToken(token *oneTimeToken, expiration, notBefore string) (*loginToken, error) {
-	expires, err := time.Parse(time.RFC3339, expiration)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
+func NewLoginToken(token *oneTimeToken, expires, notBefore time.Time) (*loginToken, error) {
 	if time.Now().After(expires) {
 		return nil, errors.New("login token is expired")
 	}
-	validAfter, err := time.Parse(time.RFC3339, notBefore)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	if time.Now().Before(validAfter) {
+	if time.Now().Before(notBefore) {
 		return nil, errors.New("login token is not yet valid")
 	}
 	return &loginToken{
 		oneTimeToken: *token,
 		expiration:   expires,
-		notBefore:    validAfter,
+		notBefore:    notBefore,
 	}, nil
 }
 
 func CreateLoginToken(token *oneTimeToken) (*loginToken, error) {
-	return NewLoginToken(token, time.Now().Add(tokenLifespan).Format(time.RFC3339), time.Now().Format(time.RFC3339))
+	return NewLoginToken(token, time.Now().Add(tokenLifespan), time.Now())
 }
 
 // Encode returns a signed & encrypted single-use token with claims.
