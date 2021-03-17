@@ -8,14 +8,14 @@ import (
 	"github.com/chuckha/migrations"
 	"github.com/pkg/errors"
 
-	"github.com/chuckha/services/auth/app"
-	"github.com/chuckha/services/auth/infrastructure/comms/messages"
-	"github.com/chuckha/services/auth/infrastructure/comms/terminal"
-	"github.com/chuckha/services/auth/infrastructure/paseto"
-	"github.com/chuckha/services/auth/infrastructure/secret"
-	"github.com/chuckha/services/auth/infrastructure/sqlite"
-	"github.com/chuckha/services/auth/infrastructure/uuid"
-	"github.com/chuckha/services/auth/usecases"
+	"github.com/chuckha/auth/app"
+	"github.com/chuckha/auth/infrastructure/comms/messages"
+	"github.com/chuckha/auth/infrastructure/comms/terminal"
+	"github.com/chuckha/auth/infrastructure/paseto"
+	"github.com/chuckha/auth/infrastructure/secret"
+	"github.com/chuckha/auth/infrastructure/sqlite"
+	"github.com/chuckha/auth/infrastructure/uuid"
+	"github.com/chuckha/auth/usecases"
 )
 
 func main() {

@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	"github.com/chuckha/services/auth/domain"
-	"github.com/chuckha/services/auth/usecases/dto"
+	"github.com/chuckha/auth/domain"
+	"github.com/chuckha/auth/usecases/dto"
 )
 
 type Encoder interface {

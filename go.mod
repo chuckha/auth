@@ -1,4 +1,4 @@
-module github.com/chuckha/services/auth
+module github.com/chuckha/auth
 
 go 1.16
 

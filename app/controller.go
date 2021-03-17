@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/chuckha/services/auth/usecases"
+	"github.com/chuckha/auth/usecases"
 )
 
 type Controller struct {
@@ -33,10 +33,10 @@ func NewController(useCases UseCases, adapter Adapter, presenter Presenter) *Con
 	}
 }
 
-type LoginInput struct{
+type LoginInput struct {
 	EncodedToken string
 }
-type LoginOutput struct{
+type LoginOutput struct {
 	SessionID string
 }
 
@@ -48,7 +48,7 @@ func (c *Controller) Login(input *LoginInput) (*LoginOutput, error) {
 	return c.Presenter.Login(out), nil
 }
 
-type SendLoginMessageInput struct{
+type SendLoginMessageInput struct {
 	LoginMessageDestination string
 }
 type SendLoginMessageOutput struct{}

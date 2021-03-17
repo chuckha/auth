@@ -8,7 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 
-	"github.com/chuckha/services/auth/usecases/dto"
+	"github.com/chuckha/auth/usecases/dto"
 )
 
 const (

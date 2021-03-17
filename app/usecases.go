@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/chuckha/services/auth/usecases"
+	"github.com/chuckha/auth/usecases"
 )
 
 type AuthUseCases struct {
