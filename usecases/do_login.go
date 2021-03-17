@@ -7,24 +7,6 @@ import (
 	"github.com/chuckha/services/auth/usecases/dto"
 )
 
-/*
-// Encode returns a signed & encrypted single-use token with claims.
-
-
-type Encryptor interface {
-	Encrypt([]byte, interface{}, interface{}) (string, error)
-}
-
-type SetClaimer interface {
-	Set(string, string)
-}
-
-
-*/
-type SetClaimer interface {
-	Set(string, string)
-}
-
 type Decoder interface {
 	Decode(secretKey string, token string) (*dto.LoginToken, error)
 }
