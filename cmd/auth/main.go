@@ -1,12 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
-
-	"github.com/chuckha/migrations"
-	"github.com/pkg/errors"
 
 	"github.com/chuckha/auth/app"
 	"github.com/chuckha/auth/infrastructure/comms/messages"
@@ -19,17 +15,15 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "auth")
+	store, err := sqlite.NewSQLiteStore("auth-db")
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
-	if err := Initialize(db); err != nil {
+	if err := store.Initialize("cmd/auth/migrations"); err != nil {
 		panic(err)
 	}
 
 	keyGetter := &secret.KeyGetter{}
-	store := &sqlite.Store{db}
 	encdec := paseto.NewPASETOEncDec()
 	messageGen := &messages.Generator{}
 	messageSender := &terminal.Client{}
@@ -81,40 +75,4 @@ func main() {
 	})
 	fmt.Println("listening on 8888")
 	panic(http.ListenAndServe(":8888", nil))
-}
-
-// Initialize manages migrations for the test db
-func Initialize(db *sql.DB) error {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS migrations (number int)`)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	row := db.QueryRow(`SELECT number FROM migrations ORDER BY number DESC LIMIT 1`)
-	if err := row.Err(); err != nil {
-		return errors.WithStack(err)
-	}
-	latest := 0
-
-	if err := row.Scan(&latest); err != nil {
-		if err != sql.ErrNoRows {
-			return errors.WithStack(err)
-		}
-	}
-	// printlnf := func(a string, args ...interface{}) {
-	// 	fmt.Printf(a+"\n", args...)
-	// }
-	migs := migrations.FromDir("cmd/auth/migrations")
-	for _, migration := range migs[:latest] {
-		fmt.Println("Already ran migration: %d", migration.Order)
-	}
-	for _, migration := range migs[latest:] {
-		fmt.Printf("Running migration %d\n", migration.Order)
-		if _, err := db.Exec(migration.Up); err != nil {
-			return err
-		}
-		if _, err := db.Exec(`INSERT INTO migrations (number) VALUES (?)`, migration.Order); err != nil {
-			return err
-		}
-	}
-	return nil
 }
