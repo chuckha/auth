@@ -1,15 +1,15 @@
-package application
+package app
 
 import (
-	"github.com/chuckha/services/auth/internal/usecases"
+	"github.com/chuckha/services/auth/usecases"
 )
 
 type UseCasesAdapter struct{}
 
 func (a *UseCasesAdapter) Login(input *LoginInput) *usecases.DoLoginInput {
-	return nil
+	return &usecases.DoLoginInput{EncodedLoginToken: input.EncodedToken}
 }
 
 func (a *UseCasesAdapter) SendLoginMessage(in *SendLoginMessageInput) *usecases.SendLoginMessageInput {
-	return nil
+	return &usecases.SendLoginMessageInput{Destination: in.LoginMessageDestination}
 }

@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 
-	"github.com/chuckha/services/auth/internal/usecases/dto"
+	"github.com/chuckha/services/auth/usecases/dto"
 )
 
 const (
@@ -64,7 +65,7 @@ func (s *SQLite) GetToken(uid, token string) (*dto.OneTimeToken, error) {
 }
 
 func (s *SQLite) SaveToken(token *dto.OneTimeToken) error {
-	_, err := s.DB.Exec(fmt.Sprintf(`INSERT INTO %s (%s) VALUES (?, ?)`, TokensTableName, TokenFields), token.Token, token.UserID, token.Expires.Format(time.RFC3339))
+	_, err := s.DB.Exec(fmt.Sprintf(`INSERT INTO %s (%s) VALUES (?, ?, ?)`, TokensTableName, TokenFields), token.Token, token.UserID, token.Expires.Format(time.RFC3339))
 	return errors.WithStack(err)
 }
 

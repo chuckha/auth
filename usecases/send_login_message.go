@@ -1,9 +1,13 @@
 package usecases
 
 import (
-	"github.com/chuckha/services/auth/internal/domain"
-	"github.com/chuckha/services/auth/internal/usecases/dto"
+	"github.com/chuckha/services/auth/domain"
+	"github.com/chuckha/services/auth/usecases/dto"
 )
+
+type Encoder interface {
+	Encode(secretKey string, token *dto.LoginToken, footer interface{}) (string, error)
+}
 
 type MessageSender interface {
 	SendMessage(destination, contents string) error
@@ -15,10 +19,6 @@ type MessageGenerator interface {
 
 type SecretKeyGetter interface {
 	GetSecretKey() string
-}
-
-type SetClaimCreator interface {
-	NewSetClaimer(token *dto.LoginToken) domain.SetClaimer
 }
 
 type TokenRepository interface {
@@ -38,13 +38,12 @@ type IDGenerator interface {
 
 type LoginMessageSender struct {
 	IDGenerator
-	TokenRepository
-	UserRepository
-	SetClaimCreator
 	SecretKeyGetter
-	domain.Encryptor
+	Encoder
 	MessageGenerator
 	MessageSender
+	TokenRepository
+	UserRepository
 }
 
 type SendLoginMessageInput struct {
@@ -61,8 +60,9 @@ func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendL
 		return nil, err
 	}
 	dtoOTT := &dto.OneTimeToken{
-		UserID: ott.UserID,
-		Token:  ott.Token,
+		UserID:  ott.UserID,
+		Token:   ott.Token,
+		Expires: ott.Expires,
 	}
 	if err := l.SaveToken(dtoOTT); err != nil {
 		return nil, err
@@ -91,12 +91,7 @@ func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendL
 		Expiration:   loginToken.GetExpiration(),
 		NotBefore:    loginToken.GetNotBefore(),
 	}
-	sc := l.NewSetClaimer(dtoLoginToken)
-	sk, err := domain.NewSecretKey(l.GetSecretKey())
-	if err != nil {
-		return nil, err
-	}
-	encodedToken, err := loginToken.Encode(sk, l.Encryptor, sc)
+	encodedToken, err := l.Encode(l.GetSecretKey(), dtoLoginToken, nil)
 	if err != nil {
 		return nil, err
 	}

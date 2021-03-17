@@ -3,9 +3,31 @@ package usecases
 import (
 	"github.com/pkg/errors"
 
-	"github.com/chuckha/services/auth/internal/domain"
-	"github.com/chuckha/services/auth/internal/usecases/dto"
+	"github.com/chuckha/services/auth/domain"
+	"github.com/chuckha/services/auth/usecases/dto"
 )
+
+/*
+// Encode returns a signed & encrypted single-use token with claims.
+
+
+type Encryptor interface {
+	Encrypt([]byte, interface{}, interface{}) (string, error)
+}
+
+type SetClaimer interface {
+	Set(string, string)
+}
+
+
+*/
+type SetClaimer interface {
+	Set(string, string)
+}
+
+type Decoder interface {
+	Decode(secretKey string, token string) (*dto.LoginToken, error)
+}
 
 type SessionRepository interface {
 	GetSession(namespace, id string) (*dto.Session, error)
@@ -15,7 +37,7 @@ type SessionRepository interface {
 type DoLogin struct {
 	IDGenerator
 	SecretKeyGetter
-	domain.Decryptor
+	Decoder
 	TokenRepository
 	SessionRepository
 }
@@ -28,28 +50,28 @@ type DoLoginOutput struct {
 }
 
 func (d *DoLogin) Login(in *DoLoginInput) (*DoLoginOutput, error) {
-	sk, err := domain.NewSecretKey(d.GetSecretKey())
+	sk := d.GetSecretKey()
+	dtoToken, err := d.Decode(sk, in.EncodedLoginToken)
 	if err != nil {
 		return nil, err
 	}
-	loginToken, err := domain.Decode(sk, d.Decryptor, in.EncodedLoginToken)
-	if err != nil {
-		return nil, err
-	}
-	// check if one time token is valid
-	ott := loginToken.GetOneTimeToken()
-	// if this is successful then the token was good
-	dtoOTT, err := d.GetToken(ott.UserID, ott.Token)
-	if err != nil {
-		return nil, err
-	}
-	oneTimeToken, err := domain.NewOneTimeToken(dtoOTT.UserID, dtoOTT.Token, dtoOTT.Expires)
+	// regardless, we've used it. its one use is over.
+	defer d.DeleteToken(dtoToken.UserID, dtoToken.OneTimeToken)
+
+	// ensure the token has not yet been used
+	foundToken, err := d.GetToken(dtoToken.UserID, dtoToken.OneTimeToken)
 	if err != nil {
 		return nil, err
 	}
 
-	// remove the token from the repository
-	if err := d.DeleteToken(oneTimeToken.UserID, oneTimeToken.Token); err != nil {
+	// ensure the one time token has valid data
+	oneTimeToken, err := domain.NewOneTimeToken(foundToken.UserID, foundToken.Token, foundToken.Expires)
+	if err != nil {
+		return nil, err
+	}
+
+	// ensure the login token was also valid
+	if _, err := domain.NewLoginToken(oneTimeToken, dtoToken.Expiration, dtoToken.NotBefore); err != nil {
 		return nil, err
 	}
 
