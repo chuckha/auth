@@ -30,7 +30,7 @@ func (s *Store) Initialize(migrationDir string) error {
 	// Load up the migrations and run starting from the last known run migration
 	migs := migrations.FromDir(migrationDir)
 	for _, migration := range migs[:latest] {
-		fmt.Println("Already ran migration: %d", migration.Order)
+		fmt.Printf("Already ran migration: %d\n", migration.Order)
 	}
 	for _, migration := range migs[latest:] {
 		fmt.Printf("Running migration %d\n", migration.Order)
