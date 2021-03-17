@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/chuckha/migrations"
 
 	"github.com/chuckha/auth/app"
 	"github.com/chuckha/auth/infrastructure/comms/messages"
@@ -19,7 +22,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if err := store.Initialize("cmd/auth/migrations"); err != nil {
+	ctx := context.Background()
+	migrationDir := "cmd/auth/migrations"
+	sqlAdapter := migrations.NewSQLiteAdapter()
+	if err := migrations.Initialize(ctx, migrationDir, store.DB, sqlAdapter); err != nil {
 		panic(err)
 	}
 

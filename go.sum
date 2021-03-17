@@ -6,6 +6,8 @@ github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635 h1:52m0LGchQBBVqJRyY
 github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635/go.mod h1:lmLxL+FV291OopO93Bwf9fQLQeLyt33VJRUg5VJ30us=
 github.com/chuckha/migrations v0.0.0-20210317002123-39e8a89bfa4b h1:0T1KaWiXagkLpaTmkaUIRAkJWBWi4luCfNQvsQ+MeGQ=
 github.com/chuckha/migrations v0.0.0-20210317002123-39e8a89bfa4b/go.mod h1:WJrDy155MmkWHDuuzX7krthULRlJYpb3FmfxNMYMckA=
+github.com/chuckha/migrations v0.0.0-20210317122230-d57e9d0c273c h1:Ogu6gfSrFgxOzLjuKuB3asgTm20ha5I0uOOWZeYr7rg=
+github.com/chuckha/migrations v0.0.0-20210317122230-d57e9d0c273c/go.mod h1:Jr3eyvJtdl1ZzGMLg2yUawOYdkNOSxSOGBQL4gJZO1I=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=

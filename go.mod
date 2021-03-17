@@ -3,7 +3,7 @@ module github.com/chuckha/auth
 go 1.16
 
 require (
-	github.com/chuckha/migrations v0.0.0-20210317002123-39e8a89bfa4b
+	github.com/chuckha/migrations v0.0.0-20210317122230-d57e9d0c273c
 	github.com/google/uuid v1.2.0
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/o1egl/paseto v1.0.0
