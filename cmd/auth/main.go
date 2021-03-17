@@ -29,7 +29,7 @@ func main() {
 	}
 
 	keyGetter := &secret.KeyGetter{}
-	store := &sqlite.SQLite{db}
+	store := &sqlite.Store{db}
 	encdec := paseto.NewPASETOEncDec()
 	messageGen := &messages.Generator{}
 	messageSender := &terminal.Client{}

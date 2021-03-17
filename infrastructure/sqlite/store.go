@@ -22,11 +22,19 @@ const (
 	UserFields     = "id"
 )
 
-type SQLite struct {
+type Store struct {
 	DB *sql.DB
 }
 
-func (s *SQLite) GetSession(uid, id string) (*dto.Session, error) {
+func NewSQLiteStore(database string) (*Store, error) {
+	db, err := sql.Open("sqlite3", database)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &Store{db}, nil
+}
+
+func (s *Store) GetSession(uid, id string) (*dto.Session, error) {
 	out := &dto.Session{}
 	expires := ""
 	err := s.DB.QueryRow(fmt.Sprintf(`SELECT %s FROM %s WHERE id = ? AND user_id = ?`, SessionFields, SessionsTableName), id, uid).
@@ -42,13 +50,13 @@ func (s *SQLite) GetSession(uid, id string) (*dto.Session, error) {
 	return out, nil
 }
 
-func (s *SQLite) SaveSession(session *dto.Session) error {
+func (s *Store) SaveSession(session *dto.Session) error {
 	_, err := s.DB.Exec(fmt.Sprintf(`INSERT INTO %s (%s) VALUES (?, ?, ?)`, SessionsTableName, SessionFields),
 		session.ID, session.UserID, session.Expires.Format(time.RFC3339))
 	return errors.WithStack(err)
 }
 
-func (s *SQLite) GetToken(uid, token string) (*dto.OneTimeToken, error) {
+func (s *Store) GetToken(uid, token string) (*dto.OneTimeToken, error) {
 	out := &dto.OneTimeToken{}
 	expires := ""
 	err := s.DB.QueryRow(fmt.Sprintf(`SELECT %s FROM %s WHERE token = ? AND user_id = ?`, TokenFields, TokensTableName), token, uid).
@@ -64,23 +72,23 @@ func (s *SQLite) GetToken(uid, token string) (*dto.OneTimeToken, error) {
 	return out, nil
 }
 
-func (s *SQLite) SaveToken(token *dto.OneTimeToken) error {
+func (s *Store) SaveToken(token *dto.OneTimeToken) error {
 	_, err := s.DB.Exec(fmt.Sprintf(`INSERT INTO %s (%s) VALUES (?, ?, ?)`, TokensTableName, TokenFields), token.Token, token.UserID, token.Expires.Format(time.RFC3339))
 	return errors.WithStack(err)
 }
 
-func (s *SQLite) DeleteToken(uid, token string) error {
+func (s *Store) DeleteToken(uid, token string) error {
 	_, err := s.DB.Exec(fmt.Sprintf(`DELETE FROM %s WHERE token = ? AND user_id = ?`, TokensTableName), token, uid)
 	return errors.WithStack(err)
 }
 
-func (s *SQLite) GetUser(uid string) (*dto.User, error) {
+func (s *Store) GetUser(uid string) (*dto.User, error) {
 	out := &dto.User{}
 	err := s.DB.QueryRow(fmt.Sprintf(`SELECT %s FROM %s WHERE id = ?`, UserFields, UsersTableName), uid).Scan(&out.ID)
 	return out, errors.WithStack(err)
 }
 
-func (s *SQLite) CreateUser(user *dto.User) error {
+func (s *Store) CreateUser(user *dto.User) error {
 	_, err := s.DB.Exec(fmt.Sprintf(`INSERT INTO %s (%s) VALUES (?)`, UsersTableName, UserFields), user.ID)
 	return errors.WithStack(err)
 }
