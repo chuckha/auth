@@ -34,6 +34,22 @@ func NewSQLiteStore(database string) (*Store, error) {
 	return &Store{db}, nil
 }
 
+func (s *Store) LookupSession(id string) (*dto.Session, error) {
+	out := &dto.Session{}
+	expires := ""
+	err := s.DB.QueryRow(fmt.Sprintf(`SELECT %s FROM %s WHERE id = ?`, SessionFields, SessionsTableName), id).
+		Scan(&out.ID, &out.UserID, &expires)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	t, err := time.Parse(time.RFC3339, expires)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	out.Expires = t
+	return out, nil
+}
+
 func (s *Store) GetSession(uid, id string) (*dto.Session, error) {
 	out := &dto.Session{}
 	expires := ""

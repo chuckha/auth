@@ -13,3 +13,7 @@ func (p *UseCasesPresenter) Login(output *usecases.DoLoginOutput) *LoginOutput {
 func (p *UseCasesPresenter) SendLoginMessage(_ *usecases.SendLoginMessageOutput) *SendLoginMessageOutput {
 	return &SendLoginMessageOutput{}
 }
+
+func (p *UseCasesPresenter) CheckValidSession(output *usecases.ValidSessionOutput) *CheckValidSessionOutput {
+	return &CheckValidSessionOutput{UID: output.UID}
+}

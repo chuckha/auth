@@ -12,8 +12,12 @@ type Decoder interface {
 }
 
 type SessionRepository interface {
-	GetSession(namespace, id string) (*dto.Session, error)
+	GetSession(uid, id string) (*dto.Session, error)
 	SaveSession(session *dto.Session) error
+}
+
+type LookupSessionRepository interface {
+	LookupSession(id string) (*dto.Session, error)
 }
 
 type DoLogin struct {

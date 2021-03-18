@@ -13,3 +13,9 @@ func (a *UseCasesAdapter) Login(input *LoginInput) *usecases.DoLoginInput {
 func (a *UseCasesAdapter) SendLoginMessage(in *SendLoginMessageInput) *usecases.SendLoginMessageInput {
 	return &usecases.SendLoginMessageInput{Destination: in.LoginMessageDestination}
 }
+
+func (a *UseCasesAdapter) CheckValidSession(in *CheckValidSessionInput) *usecases.ValidSessionInput {
+	return &usecases.ValidSessionInput{
+		SID: in.SessionID,
+	}
+}

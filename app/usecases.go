@@ -7,4 +7,5 @@ import (
 type AuthUseCases struct {
 	*usecases.DoLogin
 	*usecases.LoginMessageSender
+	*usecases.SessionChecker
 }
