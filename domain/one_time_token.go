@@ -10,19 +10,19 @@ const (
 	oneTimeTokenLifespan = 5 * time.Hour
 )
 
-type oneTimeToken struct {
+type OneTimeToken struct {
 	UserID  string
 	Token   string
 	Expires time.Time
 }
 
-func CreateOneTimeToken(uid, token string) (*oneTimeToken, error) {
+func CreateOneTimeToken(uid, token string) (*OneTimeToken, error) {
 	return NewOneTimeToken(uid, token, time.Now().Add(oneTimeTokenLifespan))
 }
 
-func NewOneTimeToken(uid, token string, expires time.Time) (*oneTimeToken, error) {
+func NewOneTimeToken(uid, token string, expires time.Time) (*OneTimeToken, error) {
 	if uid == "" {
-		return nil, errors.New("uid cannot be empty")
+		return nil, errors.New("UID cannot be empty")
 	}
 	if token == "" {
 		return nil, errors.New("token cannot be empty")
@@ -30,7 +30,7 @@ func NewOneTimeToken(uid, token string, expires time.Time) (*oneTimeToken, error
 	if time.Now().After(expires) {
 		return nil, errors.New("one time token has expired")
 	}
-	return &oneTimeToken{
+	return &OneTimeToken{
 		UserID:  uid,
 		Token:   token,
 		Expires: expires,

@@ -11,25 +11,25 @@ const (
 	tokenLifespan = 24 * time.Hour
 )
 
-type loginToken struct {
-	oneTimeToken oneTimeToken
-	expiration   time.Time
-	notBefore    time.Time
+type LoginToken struct {
+	OneTimeToken OneTimeToken
+	Expiration   time.Time
+	NotBefore    time.Time
 }
 
-func (l *loginToken) GetExpiration() time.Time {
-	return l.expiration
+func (l *LoginToken) GetExpiration() time.Time {
+	return l.Expiration
 }
 
-func (l *loginToken) GetNotBefore() time.Time {
-	return l.notBefore
+func (l *LoginToken) GetNotBefore() time.Time {
+	return l.NotBefore
 }
 
-func (l *loginToken) GetOneTimeToken() oneTimeToken {
-	return l.oneTimeToken
+func (l *LoginToken) GetOneTimeToken() OneTimeToken {
+	return l.OneTimeToken
 }
 
-func NewLoginToken(token *oneTimeToken, expires, notBefore time.Time) (*loginToken, error) {
+func NewLoginToken(token *OneTimeToken, expires, notBefore time.Time) (*LoginToken, error) {
 	if time.Now().After(expires) {
 		return nil, errors.New("login token is expired")
 	}
@@ -39,13 +39,13 @@ func NewLoginToken(token *oneTimeToken, expires, notBefore time.Time) (*loginTok
 	if token == nil {
 		return nil, errors.New("a login token must have a one time token")
 	}
-	return &loginToken{
-		oneTimeToken: *token,
-		expiration:   expires,
-		notBefore:    notBefore,
+	return &LoginToken{
+		OneTimeToken: *token,
+		Expiration:   expires,
+		NotBefore:    notBefore,
 	}, nil
 }
 
-func CreateLoginToken(token *oneTimeToken) (*loginToken, error) {
+func CreateLoginToken(token *OneTimeToken) (*LoginToken, error) {
 	return NewLoginToken(token, time.Now().Add(tokenLifespan), time.Now())
 }

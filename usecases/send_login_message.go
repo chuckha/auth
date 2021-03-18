@@ -2,11 +2,10 @@ package usecases
 
 import (
 	"github.com/chuckha/auth/domain"
-	"github.com/chuckha/auth/usecases/dto"
 )
 
 type Encoder interface {
-	Encode(secretKey string, token *dto.LoginToken, footer interface{}) (string, error)
+	Encode(secretKey string, token *domain.LoginToken, footer interface{}) (string, error)
 }
 
 type MessageSender interface {
@@ -22,14 +21,14 @@ type SecretKeyGetter interface {
 }
 
 type TokenRepository interface {
-	GetToken(uid, token string) (*dto.OneTimeToken, error)
-	SaveToken(token *dto.OneTimeToken) error
+	GetToken(uid, token string) (*domain.OneTimeToken, error)
+	SaveToken(token *domain.OneTimeToken) error
 	DeleteToken(uid, token string) error
 }
 
 type UserRepository interface {
-	GetUser(uid string) (*dto.User, error)
-	CreateUser(*dto.User) error
+	GetUser(uid string) (*domain.User, error)
+	CreateUser(*domain.User) error
 }
 
 type IDGenerator interface {
@@ -59,12 +58,11 @@ func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendL
 	if err != nil {
 		return nil, err
 	}
-	dtoOTT := &dto.OneTimeToken{
-		UserID:  ott.UserID,
-		Token:   ott.Token,
-		Expires: ott.Expires,
+	tkn, err := domain.NewOneTimeToken(ott.UserID, ott.Token, ott.Expires)
+	if err != nil {
+		return nil, err
 	}
-	if err := l.SaveToken(dtoOTT); err != nil {
+	if err := l.SaveToken(tkn); err != nil {
 		return nil, err
 	}
 
@@ -74,8 +72,7 @@ func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendL
 		if err2 != nil {
 			return nil, err
 		}
-		u := &dto.User{ID: newUser.GetDestination()}
-		if err := l.CreateUser(u); err != nil {
+		if err := l.CreateUser(newUser); err != nil {
 			return nil, err
 		}
 	}
@@ -85,13 +82,7 @@ func (l *LoginMessageSender) SendLoginMessage(in *SendLoginMessageInput) (*SendL
 	if err != nil {
 		return nil, err
 	}
-	dtoLoginToken := &dto.LoginToken{
-		OneTimeToken: ott.Token,
-		UserID:       ott.UserID,
-		Expiration:   loginToken.GetExpiration(),
-		NotBefore:    loginToken.GetNotBefore(),
-	}
-	encodedToken, err := l.Encode(l.GetSecretKey(), dtoLoginToken, nil)
+	encodedToken, err := l.Encode(l.GetSecretKey(), loginToken, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -4,20 +4,19 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chuckha/auth/domain"
-	"github.com/chuckha/auth/usecases/dto"
 )
 
 type Decoder interface {
-	Decode(secretKey string, token string) (*dto.LoginToken, error)
+	Decode(secretKey string, token string) (*domain.LoginToken, error)
 }
 
 type SessionRepository interface {
-	GetSession(uid, id string) (*dto.Session, error)
-	SaveSession(session *dto.Session) error
+	GetSession(uid, id string) (*domain.Session, error)
+	SaveSession(session *domain.Session) error
 }
 
 type LookupSessionRepository interface {
-	LookupSession(id string) (*dto.Session, error)
+	LookupSession(id string) (*domain.Session, error)
 }
 
 type DoLogin struct {
@@ -37,15 +36,15 @@ type DoLoginOutput struct {
 
 func (d *DoLogin) Login(in *DoLoginInput) (*DoLoginOutput, error) {
 	sk := d.GetSecretKey()
-	dtoToken, err := d.Decode(sk, in.EncodedLoginToken)
+	token, err := d.Decode(sk, in.EncodedLoginToken)
 	if err != nil {
 		return nil, err
 	}
 	// regardless, we've used it. its one use is over.
-	defer d.DeleteToken(dtoToken.UserID, dtoToken.OneTimeToken)
+	defer d.DeleteToken(token.OneTimeToken.UserID, token.OneTimeToken.Token)
 
 	// ensure the token has not yet been used
-	foundToken, err := d.GetToken(dtoToken.UserID, dtoToken.OneTimeToken)
+	foundToken, err := d.GetToken(token.OneTimeToken.UserID, token.OneTimeToken.Token)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +56,7 @@ func (d *DoLogin) Login(in *DoLoginInput) (*DoLoginOutput, error) {
 	}
 
 	// ensure the login token was also valid
-	if _, err := domain.NewLoginToken(oneTimeToken, dtoToken.Expiration, dtoToken.NotBefore); err != nil {
+	if _, err := domain.NewLoginToken(oneTimeToken, token.Expiration, token.NotBefore); err != nil {
 		return nil, err
 	}
 
@@ -72,14 +71,9 @@ func (d *DoLogin) Login(in *DoLoginInput) (*DoLoginOutput, error) {
 	if err != nil {
 		return nil, err
 	}
-	dtoSession := &dto.Session{
-		ID:      session.GetID(),
-		UserID:  session.GetUID(),
-		Expires: session.GetExpires(),
-	}
 
 	// Save the new session
-	if err := d.SaveSession(dtoSession); err != nil {
+	if err := d.SaveSession(session); err != nil {
 		return nil, err
 	}
 

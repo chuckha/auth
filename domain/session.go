@@ -11,41 +11,41 @@ const (
 	sessionDuration = 30 * 24 * time.Hour
 )
 
-type session struct {
-	id      string
-	uid     string
-	expires time.Time
+type Session struct {
+	ID      string
+	UID     string
+	Expires time.Time
 }
 
-func CreateSession(sid, uid string) (*session, error) {
+func CreateSession(sid, uid string) (*Session, error) {
 	return NewSession(sid, uid, time.Now().Add(sessionDuration))
 }
 
-func NewSession(sid, uid string, expires time.Time) (*session, error) {
+func NewSession(sid, uid string, expires time.Time) (*Session, error) {
 	if sid == "" {
-		return nil, errors.New("session ID cannot be empty")
+		return nil, errors.New("Session ID cannot be empty")
 	}
 	if uid == "" {
-		return nil, errors.New("user ID cannot be empty")
+		return nil, errors.New("User ID cannot be empty")
 	}
 	if time.Now().After(expires) {
-		return nil, errors.New("session is expired")
+		return nil, errors.New("Session is expired")
 	}
-	return &session{
-		id:      sid,
-		uid:     uid,
-		expires: expires,
+	return &Session{
+		ID:      sid,
+		UID:     uid,
+		Expires: expires,
 	}, nil
 }
 
-func (s *session) GetExpires() time.Time {
-	return s.expires
+func (s *Session) GetExpires() time.Time {
+	return s.Expires
 }
 
-func (s *session) GetID() string {
-	return s.id
+func (s *Session) GetID() string {
+	return s.ID
 }
 
-func (s *session) GetUID() string {
-	return s.uid
+func (s *Session) GetUID() string {
+	return s.UID
 }

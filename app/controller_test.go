@@ -4,16 +4,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chuckha/auth/domain"
 	"github.com/chuckha/auth/usecases"
-	"github.com/chuckha/auth/usecases/dto"
 )
 
 type fakesSeshRep struct {
-	out *dto.Session
+	out *domain.Session
 	err error
 }
 
-func (f *fakesSeshRep) LookupSession(_ string) (*dto.Session, error) {
+func (f *fakesSeshRep) LookupSession(_ string) (*domain.Session, error) {
 	return f.out, f.err
 }
 
@@ -25,7 +25,7 @@ func TestController_CheckValidSession(t *testing.T) {
 			LoginMessageSender: nil,
 			SessionChecker: &usecases.SessionChecker{
 				LookupSessionRepository: &fakesSeshRep{
-					out: &dto.Session{UserID: "abc", ID: "def", Expires: time.Now().Add(1 * time.Second)},
+					out: &domain.Session{UID: "abc", ID: "def", Expires: time.Now().Add(1 * time.Second)},
 					err: nil,
 				},
 			},

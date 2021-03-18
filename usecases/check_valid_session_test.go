@@ -4,31 +4,30 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chuckha/auth/usecases/dto"
+	"github.com/chuckha/auth/domain"
 )
 
 type fakesSeshRep struct {
-	out *dto.Session
+	out *domain.Session
 	err error
 }
 
-func (f *fakesSeshRep) GetSession(uid, id string) (*dto.Session, error) {
+func (f *fakesSeshRep) LookupSession(id string) (*domain.Session, error) {
 	return f.out, f.err
 }
 
 func TestCheckValidSession_CheckValidSession(t *testing.T) {
 	cvs := &SessionChecker{
-		GetSessionRepository: &fakesSeshRep{
-			out: &dto.Session{
+		LookupSessionRepository: &fakesSeshRep{
+			out: &domain.Session{
 				ID:      "def",
-				UserID:  "abc",
+				UID:     "abc",
 				Expires: time.Now().Add(10 * time.Minute),
 			},
 			err: nil,
 		},
 	}
 	out, err := cvs.CheckValidSession(&ValidSessionInput{
-		UID: "abc",
 		SID: "def",
 	})
 	if err != nil {
@@ -36,8 +35,5 @@ func TestCheckValidSession_CheckValidSession(t *testing.T) {
 	}
 	if out.UID != "abc" {
 		t.Fatal("uid doesn't match")
-	}
-	if out.SID != "def" {
-		t.Fatal("sid doesn't match")
 	}
 }

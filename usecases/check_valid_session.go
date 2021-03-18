@@ -20,12 +20,12 @@ func (c *SessionChecker) CheckValidSession(in *ValidSessionInput) (*ValidSession
 	if err != nil {
 		return nil, err
 	}
-	domainSesh, err := domain.NewSession(session.ID, session.UserID, session.Expires)
+	domainSesh, err := domain.NewSession(session.ID, session.UID, session.Expires)
 	if err != nil {
 		return nil, err
 	}
 	return &ValidSessionOutput{
-		UID: domainSesh.GetUID(),
-		SID: domainSesh.GetID(),
+		UID: domainSesh.UID,
+		SID: domainSesh.ID,
 	}, nil
 }

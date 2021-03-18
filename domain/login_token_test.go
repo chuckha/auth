@@ -6,18 +6,18 @@ import (
 )
 
 func TestNewLoginToken(t *testing.T) {
-	_, err := NewLoginToken(&oneTimeToken{}, time.Now().Add(2*time.Second), time.Now())
+	_, err := NewLoginToken(&OneTimeToken{}, time.Now().Add(2*time.Second), time.Now())
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestNotBefore(t *testing.T) {
-	token, err := NewLoginToken(&oneTimeToken{}, time.Now().Add(3*time.Second), time.Now())
+	token, err := NewLoginToken(&OneTimeToken{}, time.Now().Add(3*time.Second), time.Now())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if token.notBefore != token.GetNotBefore() {
+	if token.NotBefore != token.GetNotBefore() {
 		t.Fatal("getter is broken on login token")
 	}
 }
